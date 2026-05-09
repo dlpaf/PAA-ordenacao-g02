@@ -47,5 +47,4 @@ Os testes serão realizados com vetores dos seguintes tamanhos:
 
 ## Referência Bibliográfica
 
-CORMEN, Thomas H. et al.  
-*Introduction to Algorithms*. MIT Press.
+Algoritmos / Thomas H. Cormen... [et al.] ; [tradução Arlete Simille Marques]. - Rio de Janeiro : Elsevier, 2012. il
