@@ -1,0 +1,21 @@
+# Bytecode e caches do interpretador
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Ferramentas (se usar depois)
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Distribuição / empacotamento
+*.egg-info/
+dist/
+build/
