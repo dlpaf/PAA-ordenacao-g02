@@ -12,18 +12,16 @@ from quick import quick_sort
 sys.setrecursionlimit(210000)
 
 
-TAMANHOS = [100, 1000, 5000, 30000, 50000, 100000, 150000, 200000]
-#TAMANHOS = [1, 10, 50, 300, 50, 100, 150, 200]
+#TAMANHOS = [100, 1000, 5000, 30000, 50000, 100000, 150000, 200000]
+TAMANHOS = [100]
 CONDICOES = ["Crescente", "Decrescente", "Aleatorio"]
 
 def testar_algoritmo(funcao, vetor):
-    comparações = 0
+    copia = vetor.copy()
     inicio = time.time()
-    # Idealmente, sua função deve retornar o contador de comparações
-    # ex: comparacoes = funcao(copia)
-    funcao(vetor.copy()) 
+    comparacoes = funcao(copia)
     fim = time.time()
-    return (fim - inicio), comparações
+    return (fim - inicio), comparacoes
 
 def main():
     resultados = []
