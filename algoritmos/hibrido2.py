@@ -1,23 +1,35 @@
 import random
 
-def insertion_sort_sub(A, p, r):
-    comp_insertion = 0
-    for j in range(p + 1, r + 1):
-        key = A[j]
-        i = j - 1
-        
-        while i >= p:
-            comp_insertion += 1  # Conta a comparação que será feita no if
-            if A[i] > key:
-                A[i + 1] = A[i]
-                i = i - 1
+# ─── Threshold ────────────────────────────────────────────────────────────────
+# Subarranjos com tamanho <= THRESHOLD são ordenados com Insertion Sort.
+# Valor 16 é padrão da literatura (IntroSort, pdqsort usam entre 8 e 32).
+# Justificativa experimental: para n pequeno, o overhead de chamadas recursivas
+# do QuickSort supera o custo O(n²) do Insertion Sort.
+THRESHOLD = 16
+
+
+# ─── Insertion Sort (igual ao da Parte 1, adaptado para subarray) ─────────────
+def insertion_sort_parcial(arr, esq, dir):
+    """
+    Insertion Sort aplicado apenas no intervalo [esq, dir] do vetor.
+    Igual à lógica do insertion_sort original, mas com índices de início/fim.
+    """
+    comparacoes = 0
+    for i in range(esq + 1, dir + 1):
+        key = arr[i]
+        j = i - 1
+        while j >= esq:
+            comparacoes += 1
+            if key < arr[j]:
+                arr[j + 1] = arr[j]
+                j -= 1
             else:
                 break
-        A[i + 1] = key
-        
-    return comp_insertion
+        arr[j + 1] = key
+    return comparacoes
 
 
+# ─── Partição com pivô aleatório (igual ao da Parte 1) ───────────────────────
 def partition(A, p, r):
     comparacoes_particao = 0
     x = A[r]
@@ -32,31 +44,43 @@ def partition(A, p, r):
 
 
 def partition_random(A, p, r):
-    # Escolhe um índice aleatório e troca com o último para usar como pivô
     idx_aleatorio = random.randint(p, r)
-    A[r], A[idx_aleatorio] = A[idx_aleatorio], A[r] 
-    return partition(A, p, r) 
+    A[r], A[idx_aleatorio] = A[idx_aleatorio], A[r]
+    return partition(A, p, r)
 
 
+# ─── AOH: QuickSort Híbrido ───────────────────────────────────────────────────
 def quicksort_hibrido(A, p, r):
-    total_comparacoes = 0
-    
-    while p < r:
-        # Se o tamanho do subvetor atual for menor que k (k = 16)
-        if (r - p + 1) < 16:
-            total_comparacoes += insertion_sort_sub(A, p, r)
-            break
-        else:
-            # Chama a partição randomizada idêntica à do seu quick puro
-            q, comps = partition_random(A, p, r)
-            total_comparacoes += comps
-            
-            # Otimização da pilha de recursão (trata a menor partição primeiro)
-            if (q - p) < (r - q):
-                total_comparacoes += quicksort_hibrido(A, p, q - 1)
-                p = q + 1
-            else:
-                total_comparacoes += quicksort_hibrido(A, q + 1, r)
-                r = q - 1
-                
-    return total_comparacoes
+    """
+    Algoritmo de Ordenação Híbrido (AOH).
+
+    Estratégia:
+      - Se o subarray tem tamanho <= THRESHOLD: usa Insertion Sort
+        (mais eficiente para subarranjos pequenos e quase-ordenados)
+      - Caso contrário: usa QuickSort com pivô aleatório
+        (melhor desempenho médio em vetores grandes)
+
+    Justificativa (baseada nos resultados experimentais da Parte 1):
+      - QuickSort foi o mais rápido em vetores aleatórios e decrescentes
+        em todos os tamanhos testados.
+      - Insertion Sort foi até 23x mais rápido que QuickSort em vetores
+        crescentes, pois tem complexidade O(n) nesse cenário.
+      - Nos estágios finais da recursão do QuickSort, os subarranjos
+        pequenos já estão quase ordenados — cenário ideal para Insertion Sort.
+    """
+    total_comps = 0
+
+    # Subarray pequeno: delegar ao Insertion Sort
+    if r - p + 1 <= THRESHOLD:
+        if p < r:
+            total_comps += insertion_sort_parcial(A, p, r)
+        return total_comps
+
+    # Subarray grande: particionar e recursar
+    if p < r:
+        q, comps = partition_random(A, p, r)
+        total_comps += comps
+        total_comps += quicksort_hibrido(A, p, q - 1)
+        total_comps += quicksort_hibrido(A, q + 1, r)
+
+    return total_comps
