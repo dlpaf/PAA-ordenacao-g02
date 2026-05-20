@@ -8,7 +8,7 @@ from heap import heap_sort
 from insertion import insertion_sort
 from merge import merge_sort
 from quick import quick_sort
-from algoritmos.hibrido import hybrid_quick_sort
+from hibrido2 import hybrid_quick_sort
 
 sys.setrecursionlimit(210000)
 
