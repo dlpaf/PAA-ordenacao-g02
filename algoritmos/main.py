@@ -8,12 +8,13 @@ from heap import heap_sort
 from insertion import insertion_sort
 from merge import merge_sort
 from quick import quick_sort
+from algoritmos.hibrido import hybrid_quick_sort
 
 sys.setrecursionlimit(210000)
 
 
-#TAMANHOS = [100, 1000, 5000, 30000, 50000, 100000, 150000, 200000]
-TAMANHOS = [100]
+TAMANHOS = [100, 1000, 5000, 30000, 50000, 100000, 150000, 200000]
+
 CONDICOES = ["Crescente", "Decrescente", "Aleatorio"]
 
 def testar_algoritmo(funcao, vetor):
@@ -35,11 +36,12 @@ def main():
             else: v = random.sample(range(tamanho * 2), tamanho)
 
             algoritmos = [
-                ("Bubble Sort", lambda v: bubble_sort(v)),
-                ("Insertion Sort", lambda v: insertion_sort(v)),
-                ("Merge Sort", lambda v: merge_sort(v, 0, len(v) - 1)),
-                ("Heap Sort", lambda v: heap_sort(v)),
-                ("Quick Sort", lambda v: quick_sort(v, 0, len(v) - 1))
+                #("Bubble Sort", lambda v: bubble_sort(v)),
+                #("Insertion Sort", lambda v: insertion_sort(v)),
+                #("Merge Sort", lambda v: merge_sort(v, 0, len(v) - 1)),
+                #("Heap Sort", lambda v: heap_sort(v)),
+                #("Quick Sort", lambda v: quick_sort(v, 0, len(v) - 1))
+                ("Hybrid Quick Sort", lambda v: hybrid_quick_sort(v, 0, len(v) - 1))
             ]
           
 
