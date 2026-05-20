@@ -21,7 +21,6 @@ def partition_random(A, p, r):
 def quick_sort(A, p, r):
     total_comps = 0
     if p < r:
-        # MUDANÇA AQUI: Chame partition_random em vez de partition
         q, comps = partition_random(A, p, r)
         total_comps += comps
         
