@@ -1,73 +1,49 @@
-import random
-
-# O Cormen sugere valores pequenos entre 10 e 20 para sistemas reais.
-# Faremos o teste com 16 para poupar o Python.
-THRESHOLD = 16
-
-def insertion_sort_global(A):
+def insertion_sort_sub(A, p, r):
     """
-    Insertion Sort clássico do Cormen (Capítulo 2) aplicado ao vetor inteiro.
-    Como o vetor já está 'quase ordenado' pelo Quick Sort truncado,
-    esta função roda de forma ultra rápida (próxima a O(N)).
+    Insertion Sort que ordena apenas o subvetor de p até r (inclusive).
     """
-    comparacoes = 0
-    for j in range(1, len(A)):
+    for j in range(p + 1, r + 1):
         key = A[j]
         i = j - 1
-        while i >= 0:
-            comparacoes += 1
-            if A[i] > key:
-                A[i + 1] = A[i]
-                i = i - 1
-            else:
-                break
+        # Move os elementos de A[p..j-1] que são maiores que a key
+        # para uma posição à frente da sua posição atual
+        while i >= p and A[i] > key:
+            A[i + 1] = A[i]
+            i = i - 1
         A[i + 1] = key
-    return comparacoes
 
 def partition(A, p, r):
-    comparacoes_particao = 0
-    x = A[r]
+    """
+    Particionamento clássico do livro do Cormen (pivô é o último elemento).
+    """
+    x = A[r]  # Pivô
     i = p - 1
     for j in range(p, r):
-        comparacoes_particao += 1
         if A[j] <= x:
-            i += 1
+            i = i + 1
             A[i], A[j] = A[j], A[i]
     A[i + 1], A[r] = A[r], A[i + 1]
-    return i + 1, comparacoes_particao
+    return i + 1
 
-def partition_random(A, p, r):
-    idx_aleatorio = random.randint(p, r)
-    A[r], A[idx_aleatorio] = A[idx_aleatorio], A[r]
-    return partition(A, p, r)
-
-def quick_sort_truncated(A, p, r):
+def quicksort_hibrido(A, p, r):
     """
-    Quick Sort baseado no Cormen, mas com o critério de parada precoce:
-    Se o tamanho do bloco for menor que THRESHOLD, ele não gasta tempo dividindo.
+    Quick Sort Híbrido com Otimização de Recursão de Cauda 
+    e corte para Insertion Sort se o tamanho for menor que k (16).
     """
-    total_comps = 0
-    if p < r:
-        # Se o subvetor atual for menor que o limite, interrompe a recursão imediatamente
-        if (r - p + 1) < THRESHOLD:
-            return 0
+    while p < r:
+        # Se o tamanho do subvetor for menor que 16 (k = 16)
+        if (r - p + 1) < 16:
+            insertion_sort_sub(A, p, r)
+            break
+        else:
+            # Particiona o vetor
+            q = partition(A, p, r)
             
-        q, comps = partition_random(A, p, r)
-        total_comps += comps
-        
-        total_comps += quick_sort_truncated(A, p, q - 1)
-        total_comps += quick_sort_truncated(A, q + 1, r)
-        
-    return total_comps
-
-def hybrid_quick_sort(A, p, r):
-    """
-    Função principal que cumpre a proposta acadêmica inteligente.
-    """
-    # Passo 1: O Quick Sort organiza apenas os 'grandes blocos' e ignora os menores
-    total_comparacoes = quick_sort_truncated(A, p, r)
-    
-    # Passo 2: Uma única passada linear resolve todas as pendências locais eficientemente
-    total_comparacoes += insertion_sort_global(A)
-    
-    return total_comparacoes
+            # Otimização da pilha: faz a recursão na MENOR partição primeiro
+            # e atualiza os limites do laço while para a MAIOR partição.
+            if (q - p) < (r - q):
+                quicksort_hibrido(A, p, q - 1) # Menor partição à esquerda
+                p = q + 1                      # Transforma a recursão da direita em iteração
+            else:
+                quicksort_hibrido(A, q + 1, r) # Menor partição à direita
+                r = q - 1                      # Transforma a recursão da esquerda em iteração

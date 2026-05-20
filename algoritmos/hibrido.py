@@ -56,7 +56,7 @@ def quick_sort_truncated(A, p, r):
         
     return total_comps
 
-def hybrid_quick_sort(A, p, r):
+def hybrid_quick_sort3(A, p, r):
     """
     Função principal que cumpre a proposta acadêmica.
     """
