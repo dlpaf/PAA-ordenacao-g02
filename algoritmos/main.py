@@ -9,6 +9,7 @@ from insertion import insertion_sort
 from merge import merge_sort
 from quick import quick_sort
 from hibrido2 import quicksort_hibrido
+from timsort import timsort
 
 
 sys.setrecursionlimit(210000)
@@ -42,7 +43,8 @@ def main():
                 #("Merge Sort", lambda v: merge_sort(v, 0, len(v) - 1)),
                 #("Heap Sort", lambda v: heap_sort(v)),
                 #("Quick Sort", lambda v: quick_sort(v, 0, len(v) - 1))
-                ("Hybrid Quick Sort", lambda v: quicksort_hibrido(v, 0, len(v) - 1))
+                #("Hybrid Quick Sort", lambda v: quicksort_hibrido(v, 0, len(v) - 1)),
+                ("Tim Sort", lambda v: timsort(v, 0, len(v) - 1))
             ]
           
 
