@@ -1,376 +1,131 @@
-# interface_testes.py
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 import time
-import copy
+import random
 import matplotlib.pyplot as plt
 
-from algoritmos.quick import quicksort_inplace
+# Importando os SEUS algoritmos da pasta correta
+from algoritmos.bubble import bubble_sort
+from algoritmos.insertion import insertion_sort
+from algoritmos.merge import merge_sort
 from algoritmos.heap import heap_sort
+from algoritmos.quick import quick_sort
 
 # =========================
-# IMPORTAÇÃO DOS VETORES
+# GERAÇÃO DINÂMICA DE VETORES
 # =========================
-
-from vectors.vector_100 import (
-    vector_crescente as vc_100,
-    vector_decrescente as vd_100,
-    vector_aleatorio as va_100
-)
-
-from vectors.vector_1000 import (
-    vector_crescente as vc_1000,
-    vector_decrescente as vd_1000,
-    vector_aleatorio as va_1000
-)
-
-from vectors.vector_5000 import (
-    vector_crescente as vc_5000,
-    vector_decrescente as vd_5000,
-    vector_aleatorio as va_5000
-)
-
-from vectors.vector_30000 import (
-    vector_crescente as vc_30000,
-    vector_decrescente as vd_30000,
-    vector_aleatorio as va_30000
-)
-
-from vectors.vector_50000 import (
-    vector_crescente as vc_50000,
-    vector_decrescente as vd_50000,
-    vector_aleatorio as va_50000
-)
-
-from vectors.vector_100000 import (
-    vector_crescente as vc_100000,
-    vector_decrescente as vd_100000,
-    vector_aleatorio as va_100000
-)
-
-from vectors.vector_150000 import (
-    vector_crescente as vc_150000,
-    vector_decrescente as vd_150000,
-    vector_aleatorio as va_150000
-)
-
-from vectors.vector_200000 import (
-    vector_crescente as vc_200000,
-    vector_decrescente as vd_200000,
-    vector_aleatorio as va_200000
-)
+def gerar_vetor(tamanho, tipo):
+    if tipo == "crescente":
+        return list(range(tamanho))
+    elif tipo == "decrescente":
+        return list(range(tamanho, 0, -1))
+    else: # Aleatório
+        return random.sample(range(tamanho * 2), tamanho)
 
 # =========================
-# DICIONÁRIO DOS VETORES
+# FUNÇÃO DE EXECUÇÃO
 # =========================
-
-vetores = {
-    100: {
-        "crescente": vc_100,
-        "decrescente": vd_100,
-        "aleatorio": va_100
-    },
-
-    1000: {
-        "crescente": vc_1000,
-        "decrescente": vd_1000,
-        "aleatorio": va_1000
-    },
-
-    5000: {
-        "crescente": vc_5000,
-        "decrescente": vd_5000,
-        "aleatorio": va_5000
-    },
-
-    30000: {
-        "crescente": vc_30000,
-        "decrescente": vd_30000,
-        "aleatorio": va_30000
-    },
-
-    50000: {
-        "crescente": vc_50000,
-        "decrescente": vd_50000,
-        "aleatorio": va_50000
-    },
-
-    100000: {
-        "crescente": vc_100000,
-        "decrescente": vd_100000,
-        "aleatorio": va_100000
-    },
-
-    150000: {
-        "crescente": vc_150000,
-        "decrescente": vd_150000,
-        "aleatorio": va_150000
-    },
-
-    200000: {
-        "crescente": vc_200000,
-        "decrescente": vd_200000,
-        "aleatorio": va_200000
-    }
-}
-
-# =========================
-# FUNÇÃO DE TEMPO
-# =========================
-
-def medir_tempo(funcao, vetor):
-
-    vetor_teste = copy.deepcopy(vetor)
-
+def medir_desempenho(algoritmo_nome, vetor):
+    vetor_teste = vetor.copy()
     inicio = time.perf_counter()
-
-    funcao(vetor_teste)
-
+    
+    comparacoes = 0
+    if algoritmo_nome == "Bubble Sort":
+        comparacoes = bubble_sort(vetor_teste)
+    elif algoritmo_nome == "Insertion Sort":
+        comparacoes = insertion_sort(vetor_teste)
+    elif algoritmo_nome == "Merge Sort":
+        comparacoes = merge_sort(vetor_teste, 0, len(vetor_teste) - 1)
+    elif algoritmo_nome == "Heap Sort":
+        comparacoes = heap_sort(vetor_teste)
+    elif algoritmo_nome == "Quick Sort":
+        comparacoes = quick_sort(vetor_teste, 0, len(vetor_teste) - 1)
+        
     fim = time.perf_counter()
-
-    return fim - inicio
-
-# =========================
-# GERAR GRÁFICO
-# =========================
+    return (fim - inicio), comparacoes
 
 def gerar_grafico(nomes, tempos):
-
     plt.figure(figsize=(8, 5))
-
-    plt.bar(nomes, tempos)
-
-    plt.xlabel("Algoritmos")
+    plt.bar(nomes, tempos, color='skyblue')
     plt.ylabel("Tempo (segundos)")
     plt.title("Comparação de Desempenho")
-
-    for i, tempo in enumerate(tempos):
-
-        plt.text(
-            i,
-            tempo,
-            f"{tempo:.6f}s",
-            ha='center',
-            va='bottom'
-        )
-
+    for i, t in enumerate(tempos):
+        plt.text(i, t, f"{t:.4f}s", ha='center', va='bottom')
     plt.show()
 
-# =========================
-# EXECUTAR TESTE
-# =========================
-
 def executar_teste():
-
     try:
-
         tamanho = int(combo_tamanho.get())
         tipo = combo_tipo.get().lower()
-        algoritmo = combo_algoritmo.get()
+        algoritmo_selecionado = combo_algoritmo.get()
 
-        vetor = vetores[tamanho][tipo]
+       
+        vetor = gerar_vetor(tamanho, tipo)
 
         resultado_text.delete(1.0, tk.END)
+        resultado_text.insert(tk.END, f"--- RELATÓRIO DE EXECUÇÃO ---\n")
+        resultado_text.insert(tk.END, f"Tamanho: {tamanho} | Tipo: {tipo}\n\n")
 
-        resultado_text.insert(tk.END, "========== RESULTADO ==========\n\n")
-        resultado_text.insert(tk.END, f"Tamanho: {tamanho}\n")
-        resultado_text.insert(tk.END, f"Entrada: {tipo}\n\n")
+        lista_algos = []
+        if algoritmo_selecionado == "Comparar Todos":
+            lista_algos = ["Bubble Sort", "Insertion Sort", "Merge Sort", "Heap Sort", "Quick Sort"]
+        else:
+            lista_algos = [algoritmo_selecionado]
 
-        nomes = []
-        tempos = []
+        nomes_grafico = []
+        tempos_grafico = []
 
-        # QUICK SORT
-        if algoritmo == "Quick Sort":
+        for algo in lista_algos:
+           
+            if tamanho > 50000 and algo in ["Bubble Sort", "Insertion Sort"]:
+                resultado_text.insert(tk.END, f"{algo}: Pulado (muito lento para este tamanho)\n")
+                continue
 
-            tempo = medir_tempo(quicksort_inplace, vetor)
+            tempo, comps = medir_desempenho(algo, vetor)
+            nomes_grafico.append(algo)
+            tempos_grafico.append(tempo)
+            
+            resultado_text.insert(tk.END, f"> {algo}:\n")
+            resultado_text.insert(tk.END, f"  Tempo: {tempo:.6f}s\n")
+            resultado_text.insert(tk.END, f"  Comparações: {int(comps)}\n\n")
+        
+        if tempos_grafico:
+            gerar_grafico(nomes_grafico, tempos_grafico)
 
-            nomes.append("Quick Sort")
-            tempos.append(tempo)
-
-            resultado_text.insert(
-                tk.END,
-                f"Quick Sort: {tempo:.6f} segundos\n"
-            )
-
-        # HEAP SORT
-        elif algoritmo == "Heap Sort":
-
-            tempo = medir_tempo(heap_sort, vetor)
-
-            nomes.append("Heap Sort")
-            tempos.append(tempo)
-
-            resultado_text.insert(
-                tk.END,
-                f"Heap Sort: {tempo:.6f} segundos\n"
-            )
-
-        # COMPARAÇÃO
-        elif algoritmo == "Comparar Ambos":
-
-            tempo_quick = medir_tempo(quicksort_inplace, vetor)
-            tempo_heap = medir_tempo(heap_sort, vetor)
-
-            nomes.extend(["Quick Sort", "Heap Sort"])
-            tempos.extend([tempo_quick, tempo_heap])
-
-            resultado_text.insert(
-                tk.END,
-                f"Quick Sort: {tempo_quick:.6f} segundos\n"
-            )
-
-            resultado_text.insert(
-                tk.END,
-                f"Heap Sort: {tempo_heap:.6f} segundos\n\n"
-            )
-
-            if tempo_quick < tempo_heap:
-
-                resultado_text.insert(
-                    tk.END,
-                    "Quick Sort foi mais rápido.\n"
-                )
-
-            else:
-
-                resultado_text.insert(
-                    tk.END,
-                    "Heap Sort foi mais rápido.\n"
-                )
-
-        # GERA O GRÁFICO
-        gerar_grafico(nomes, tempos)
-
-    except Exception as erro:
-
-        messagebox.showerror(
-            "Erro",
-            f"Ocorreu um erro:\n{erro}"
-        )
+    except Exception as e:
+        messagebox.showerror("Erro", f"Falha na execução: {e}")
 
 # =========================
-# INTERFACE
+# INTERFACE GRÁFICA (Ajustada)
 # =========================
-
 janela = tk.Tk()
+janela.title("PAA - Ordenação 2026.1")
+janela.geometry("600x650")
 
-janela.title("Comparador de Algoritmos")
-janela.geometry("700x500")
-janela.resizable(False, False)
-
-titulo = tk.Label(
-    janela,
-    text="Comparador de Algoritmos de Ordenação",
-    font=("Arial", 18, "bold")
-)
-
-titulo.pack(pady=20)
+tk.Label(janela, text="Projeto e Análise de Algoritmos", font=("Arial", 14, "bold")).pack(pady=10)
 
 frame = tk.Frame(janela)
 frame.pack(pady=10)
 
-# =========================
-# TAMANHO
-# =========================
-
-tk.Label(
-    frame,
-    text="Tamanho do Vetor:"
-).grid(row=0, column=0, padx=10, pady=10)
-
-combo_tamanho = ttk.Combobox(
-    frame,
-    values=[
-        100,
-        1000,
-        5000,
-        30000,
-        50000,
-        100000,
-        150000,
-        200000
-    ],
-    state="readonly"
-)
-
-combo_tamanho.grid(row=0, column=1)
+# Configuração dos campos
+tk.Label(frame, text="Tamanho:").grid(row=0, column=0, padx=5)
+combo_tamanho = ttk.Combobox(frame, values=[500], state="readonly")
+combo_tamanho.grid(row=0, column=1, pady=5)
 combo_tamanho.current(0)
 
-# =========================
-# TIPO
-# =========================
-
-tk.Label(
-    frame,
-    text="Tipo da Entrada:"
-).grid(row=1, column=0, padx=10, pady=10)
-
-combo_tipo = ttk.Combobox(
-    frame,
-    values=[
-        "Crescente",
-        "Decrescente",
-        "Aleatorio"
-    ],
-    state="readonly"
-)
-
-combo_tipo.grid(row=1, column=1)
+tk.Label(frame, text="Entrada:").grid(row=1, column=0, padx=5)
+combo_tipo = ttk.Combobox(frame, values=["Aleatorio", "Crescente", "Decrescente"], state="readonly")
+combo_tipo.grid(row=1, column=1, pady=5)
 combo_tipo.current(0)
 
-# =========================
-# ALGORITMO
-# =========================
+tk.Label(frame, text="Algoritmo:").grid(row=2, column=0, padx=5)
+combo_algoritmo = ttk.Combobox(frame, values=["Bubble Sort", "Insertion Sort", "Merge Sort", "Heap Sort", "Quick Sort", "Comparar Todos"], state="readonly")
+combo_algoritmo.grid(row=2, column=1, pady=5)
+combo_algoritmo.current(5)
 
-tk.Label(
-    frame,
-    text="Algoritmo:"
-).grid(row=2, column=0, padx=10, pady=10)
+tk.Button(janela, text="EXECUTAR ORDENAÇÃO", command=executar_teste, bg="green", fg="white", font=("Arial", 10, "bold")).pack(pady=20)
 
-combo_algoritmo = ttk.Combobox(
-    frame,
-    values=[
-        "Quick Sort",
-        "Heap Sort",
-        "Comparar Ambos"
-    ],
-    state="readonly"
-)
-
-combo_algoritmo.grid(row=2, column=1)
-combo_algoritmo.current(2)
-
-# =========================
-# BOTÃO
-# =========================
-
-botao = tk.Button(
-    janela,
-    text="Executar Teste",
-    command=executar_teste,
-    font=("Arial", 12, "bold"),
-    padx=20,
-    pady=10
-)
-
-botao.pack(pady=20)
-
-# =========================
-# RESULTADO
-# =========================
-
-resultado_text = tk.Text(
-    janela,
-    width=80,
-    height=15,
-    font=("Consolas", 11)
-)
-
-resultado_text.pack(pady=10)
-
-# =========================
-# INICIAR
-# =========================
+resultado_text = tk.Text(janela, width=70, height=20, font=("Consolas", 10))
+resultado_text.pack(pady=10, padx=10)
 
 janela.mainloop()

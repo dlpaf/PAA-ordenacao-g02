@@ -1,20 +1,22 @@
-#Arquivo principal para execução dos algoritmos de ordenação
 import random
 import time
 import pandas as pd # Sugestão para facilitar a criação de tabelas e gráficos depois
 import sys
 
-from algoritmos.bubble import bubble_sort
-from algoritmos.heap import heap_sort
-from algoritmos.insertion import insertion_sort
-from algoritmos.merge import merge_sort
-from algoritmos.quick import quick_sort
+from bubble import bubble_sort
+from heap import heap_sort
+from insertion import insertion_sort
+from merge import merge_sort
+from quick import quick_sort
+from hibrido2 import quicksort_hibrido
+from timsort import timsort
+
 
 sys.setrecursionlimit(210000)
 
 
-#TAMANHOS = [100, 1000, 5000, 30000, 50000, 100000, 150000, 200000]
-TAMANHOS = [1, 10, 50, 300, 50, 100, 150, 200]
+TAMANHOS = [100, 1000, 5000, 30000, 50000, 100000, 150000, 200000]
+
 CONDICOES = ["Crescente", "Decrescente", "Aleatorio"]
 
 def testar_algoritmo(funcao, vetor):
@@ -36,11 +38,13 @@ def main():
             else: v = random.sample(range(tamanho * 2), tamanho)
 
             algoritmos = [
-                ("Bubble Sort", lambda v: bubble_sort(v)),
-                ("Insertion Sort", lambda v: insertion_sort(v)),
-                ("Merge Sort", lambda v: merge_sort(v, 0, len(v) - 1)),
-                ("Heap Sort", lambda v: heap_sort(v)),
-                ("Quick Sort", lambda v: quick_sort(v, 0, len(v) - 1))
+                #("Bubble Sort", lambda v: bubble_sort(v)),
+                #("Insertion Sort", lambda v: insertion_sort(v)),
+                #("Merge Sort", lambda v: merge_sort(v, 0, len(v) - 1)),
+                #("Heap Sort", lambda v: heap_sort(v)),
+                #("Quick Sort", lambda v: quick_sort(v, 0, len(v) - 1))
+                #("Hybrid Quick Sort", lambda v: quicksort_hibrido(v, 0, len(v) - 1)),
+                ("Tim Sort", lambda v: timsort(v, 0, len(v) - 1))
             ]
           
 

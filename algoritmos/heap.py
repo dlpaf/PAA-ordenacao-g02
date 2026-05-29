@@ -1,41 +1,51 @@
-# Ordenação por Heap Sort
-
 def left(i):
     return 2 * i + 1
-
 
 def right(i):
     return 2 * i + 2
 
-
 def max_heapify(A, heap_size, i):
-    """Mantém a propriedade de max-heap para o nó i."""
+    comparacoes = 0
     l = left(i)
     r = right(i)
     largest = i
 
-    if l < heap_size and A[l] > A[largest]:
-        largest = l
-    if r < heap_size and A[r] > A[largest]:
-        largest = r
+    # Comparação 1: Pai com o filho esquerdo
+    if l < heap_size:
+        comparacoes += 1 # Contabiliza a comparação de chaves: A[l] > A[i]
+        if A[l] > A[i]:
+            largest = l
+    
+    # Comparação 2: O maior atual com o filho direito
+    if r < heap_size:
+        comparacoes += 1 # Contabiliza a comparação de chaves: A[r] > A[largest]
+        if A[r] > A[largest]:
+            largest = r
+
     if largest != i:
         A[i], A[largest] = A[largest], A[i]
-        max_heapify(A, heap_size, largest)
-
+        # Acumula comparações da chamada recursiva
+        comparacoes += max_heapify(A, heap_size, largest)
+        
+    return comparacoes
 
 def build_max_heap(A):
-    """Constrói um max heap a partir de um array não ordenado."""
+    total_comps = 0
     heap_size = len(A)
+    # Constrói o heap de baixo para cima
     for i in range((heap_size // 2) - 1, -1, -1):
-        max_heapify(A, heap_size, i)
-    return heap_size
-
+        total_comps += max_heapify(A, heap_size, i)
+    return heap_size, total_comps
 
 def heap_sort(A):
-    """Ordena A em ordem crescente usando heap sort."""
-    heap_size = build_max_heap(A)
+    # Parte I: Construção do Heap
+    heap_size, total_comps = build_max_heap(A)
+    
+    # Parte II: Ordenação propriamente dita
     for i in range(len(A) - 1, 0, -1):
-        A[0], A[i] = A[i], A[0]
+        A[0], A[i] = A[i], A[0] # Troca a raiz (maior) com o último elemento
         heap_size -= 1
-        max_heapify(A, heap_size, 0)
-    return A
+        # Restaura a propriedade de heap e soma as comparações
+        total_comps += max_heapify(A, heap_size, 0)
+        
+    return total_comps # Retorna o total para o seu main.py
